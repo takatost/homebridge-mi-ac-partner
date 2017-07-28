@@ -1,0 +1,20 @@
+{
+  "name": "homebridge-mi-ac-partner",
+  "version": "1.0.0",
+  "description": "Xiaomi Mi ac partner plugin for Homebridge.",
+  "license": "MIT",
+  "keywords": [
+    "homebridge-plugin",
+    "xiaomi",
+    "mi ac partner"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/takatost/homebridge-mi-ac-partner.git"
+  },
+  "engines": {
+    "node": ">=0.12.0",
+    "homebridge": ">=0.2.0",
+    "miio": ">=0.12.0"
+  }
+}
