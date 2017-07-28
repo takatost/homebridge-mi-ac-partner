@@ -39,10 +39,10 @@ function MiAcPartner(log, config) {
 	// Ac Partner is not available in Homekit yet, register as Fan
 	this.acPartnerService = new Service.Fan(this.name);
 
-//	this.acPartnerService
-//		.getCharacteristic(Characteristic.On)
-//		.on('get', this.getPowerState.bind(this))
-//		.on('set', this.setPowerState.bind(this));
+	this.acPartnerService
+		.getCharacteristic(Characteristic.On)
+		.on('get', this.getPowerState.bind(this))
+		.on('set', this.setPowerState.bind(this));
 
 	this.acPartnerService
 		.getCharacteristic(Characteristic.RotationSpeed)
@@ -151,18 +151,10 @@ MiAcPartner.prototype = {
 			return;
 		}
 
-		if (temp == 100) {
-			this.log.debug('Ac Partner Power on');
-                        this.device.call('send_cmd', [this.powerOnOffModes["on"]]);
-                        this.mode = 100;
-		} else if (temp == 0) {
-			this.log.debug('Ac Partner Power off');
-                        this.device.call('send_cmd', [this.powerOnOffModes["off"]]);
-                        this.mode = 0;
-		} else {
+		if (temp != 100 && temp != 0) {
 			for(var item of this.tempModes){
 				if(temp <= item[0]){
-					this.log.debug('Set temperature: ' + item[1]['temp']);
+					this.log.debug('Set temperature: ' + item[1]['temp'] + ' mode: ' + temp);
 					var code = item[1]['code'];
 					this.device.call('send_cmd', [code]);
 					this.mode = item[0];
