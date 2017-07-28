@@ -30,28 +30,30 @@ This is Xiaomi Mi Ac Partner plugin for [Homebridge](https://github.com/nfarina/
 
 2. Add following accessory to the `config.json`.
 
+Follow the [Document](https://github.com/aholstenson/miio/blob/master/docs/management.md#getting-the-token-of-a-device) to get token of ac partner.
+
    ```
      "accessories": [
        {
-		"accessory": "MiAcPartner",
-                "name": "Ac Partner",
-                "powerOnOffModes": {
-                       "on": "018011111111301402",
-                       "off": "018011111101301402"
-                },
-                "tempModes": [
-                       [10, {"temp": "29", "code": "018011111111301d12"}],
-                       [20, {"temp": "28", "code": "018011111111301c12"}],
-                       [30, {"temp": "27", "code": "018011111111301b12"}],
-                       [40, {"temp": "26", "code": "018011111111301a12"}],
-                       [50, {"temp": "25", "code": "018011111111301912"}],
-                       [60, {"temp": "24", "code": "018011111111301812"}],
-                       [70, {"temp": "23", "code": "018011111111301712"}],
-                       [80, {"temp": "22", "code": "018011111111301612"}],
-                       [90, {"temp": "21", "code": "018011111111301512"}],
-                       [100, {"temp": "20", "code": "018011111111301412"}]
-                ]
-
+		      "accessory": "MiAcPartner",
+          "token": "token-as-hex",
+          "name": "Ac Partner",
+          "powerOnOffModes": {
+                "on": "018011111111301402",
+                "off": "018011111101301402"
+          },
+          "tempModes": [
+                [10, {"temp": "29", "code": "018011111111301d12"}],
+                [20, {"temp": "28", "code": "018011111111301c12"}],
+                [30, {"temp": "27", "code": "018011111111301b12"}],
+                [40, {"temp": "26", "code": "018011111111301a12"}],
+                [50, {"temp": "25", "code": "018011111111301912"}],
+                [60, {"temp": "24", "code": "018011111111301812"}],
+                [70, {"temp": "23", "code": "018011111111301712"}],
+                [80, {"temp": "22", "code": "018011111111301612"}],
+                [90, {"temp": "21", "code": "018011111111301512"}],
+                [100, {"temp": "20", "code": "018011111111301412"}]
+          ]
        }
      ]
    ```

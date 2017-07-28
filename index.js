@@ -14,6 +14,7 @@ function MiAcPartner(log, config) {
 	this.log = log;
 	this.name = config.name || 'Ac Partner';
 	this.mode = 0;
+	this.token = config.token;
 
 	this.services = [];
 
@@ -66,6 +67,7 @@ MiAcPartner.prototype = {
 	discover: function(){
 		var accessory = this;
 		var log = this.log;
+		var token = this.token;
 
 		log.debug('Discovering Mi ac partner devices...');
 
@@ -73,9 +75,12 @@ MiAcPartner.prototype = {
 		var browser = miio.browse();
 		
 		browser.on('available', function(reg){
-			// Skip device without token
-			if(!reg.token)
-				return;
+			if (!token) {
+                    log.debug('token is invalid');
+                    return;
+            }
+
+            reg['token'] = token;
 
 			miio.device(reg).then(function(device){
 				if(device.type != 'gateway')
@@ -91,10 +96,6 @@ MiAcPartner.prototype = {
 		});
 
 		browser.on('unavailable', function(reg){
-			// Skip device without token
-			if(!reg.token)
-				return;
-
 			var device = devices[reg.id];
 			
 			if(!device)
