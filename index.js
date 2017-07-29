@@ -53,10 +53,6 @@ function MiAcPartner(log, config) {
     	.on('set', this.setTargetHeatingCoolingState.bind(this))
     	.on('get', this.getTargetHeatingCoolingState.bind(this));
 
-    this.acPartnerService
-    	.getCharacteristic(Characteristic.CurrentHeatingCoolingState)    
-    	.on('get', this.getCurrentHeatingCoolingState.bind(this));
-
 	this.acPartnerService
 		.getCharacteristic(Characteristic.TargetTemperature)
 	    .setProps({
@@ -116,6 +112,14 @@ MiAcPartner.prototype = {
 		});
 
 		browser.on('unavailable', function(reg){
+			if(reg.type != 'gateway') {
+					return;
+			}	
+
+			if(reg.model != 'lumi.acpartner.v1') {
+				return;
+			}
+
 			var device = devices[reg.id];
 			
 			if(!device)
@@ -142,10 +146,6 @@ MiAcPartner.prototype = {
 	      this.SendCmd();
 	    }
 	    callback();
-	},
-
-	getCurrentHeatingCoolingState: function(callback) {
-    	callback(null, this.TargetHeatingCoolingState);
 	},
 
 	getTargetTemperature: function(callback) {
