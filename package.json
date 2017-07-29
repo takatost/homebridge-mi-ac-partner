@@ -1,6 +1,6 @@
 {
   "name": "homebridge-mi-ac-partner",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Xiaomi Mi ac partner plugin for Homebridge.",
   "license": "MIT",
   "keywords": [

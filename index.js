@@ -13,42 +13,59 @@ module.exports = function(homebridge) {
 function MiAcPartner(log, config) {
 	this.log = log;
 	this.name = config.name || 'Ac Partner';
-	this.mode = 0;
 	this.token = config.token;
+
+	this.TargetHeatingCoolingState = Characteristic.TargetHeatingCoolingState.OFF;
+	this.TargetTemperature = 23;
+	this.codePrefix = "0180111111";
 
 	this.services = [];
 
-	this.powerOnOffModes = config.powerOnOffModes || {
-                "on": "018011111111301402",
-                "off": "018011111101301402"
+	this.stateMaps = {
+		3: "2",
+		2: "1",
+		1: "0",
 	};
 
-	// Modes supported
-	this.tempModes = config.tempModes || [
-                [10, {"temp": "29", "code": "018011111111301d12"}],
-                [20, {"temp": "28", "code": "018011111111301c12"}],
-                [30, {"temp": "27", "code": "018011111111301b12"}],
-                [40, {"temp": "26", "code": "018011111111301a12"}],
-                [50, {"temp": "25", "code": "018011111111301912"}],
-                [60, {"temp": "24", "code": "018011111111301812"}],
-                [70, {"temp": "23", "code": "018011111111301712"}],
-                [80, {"temp": "22", "code": "018011111111301612"}],
-                [90, {"temp": "21", "code": "018011111111301512"}],
-                [100, {"temp": "20", "code": "018011111111301412"}]
-	];
+	this.tempMaps = {
+		30: "1e",
+        29: "1d",
+        28: "1c",
+        27: "1b",
+        26: "1a",
+        25: "19",
+        24: "18",
+        23: "17",
+        22: "16",
+        21: "15",
+        20: "14",
+        19: "13",
+        18: "12",
+        17: "11",
+        16: "10"
+	};
 
 	// Ac Partner is not available in Homekit yet, register as Fan
-	this.acPartnerService = new Service.Fan(this.name);
+	this.acPartnerService = new Service.Thermostat(this.name);
+
+  	this.acPartnerService
+  		.getCharacteristic(Characteristic.TargetHeatingCoolingState)
+    	.on('set', this.setTargetHeatingCoolingState.bind(this))
+    	.on('get', this.getTargetHeatingCoolingState.bind(this));
+
+    this.acPartnerService
+    	.getCharacteristic(Characteristic.CurrentHeatingCoolingState)    
+    	.on('get', this.getCurrentHeatingCoolingState.bind(this));
 
 	this.acPartnerService
-		.getCharacteristic(Characteristic.On)
-		.on('get', this.getPowerState.bind(this))
-		.on('set', this.setPowerState.bind(this));
-
-	this.acPartnerService
-		.getCharacteristic(Characteristic.RotationSpeed)
-		.on('get', this.getTemperature.bind(this))
-		.on('set', this.setTemperature.bind(this));
+		.getCharacteristic(Characteristic.TargetTemperature)
+	    .setProps({
+	        maxValue: 30,
+	        minValue: 16,
+	        minStep: 1
+	    })
+	    .on('set', this.setTargetTemperature.bind(this))
+	    .on('get', this.getTargetTemperature.bind(this));
 
 	this.services.push(this.acPartnerService);
 
@@ -80,14 +97,17 @@ MiAcPartner.prototype = {
                     return;
             }
 
-            reg['token'] = token;
+            if(reg.type != 'gateway') {
+					return;
+			}	
+
+			if(reg.model != 'lumi.acpartner.v1') {
+				return;
+			}
+
+            reg.token = token;
 
 			miio.device(reg).then(function(device){
-				if(device.type != 'gateway')
-					return;
-				if(device.model != 'lumi.acpartner.v1')
-					return;
-
 				devices[reg.id] = device;
 				accessory.device = device;
 
@@ -106,65 +126,44 @@ MiAcPartner.prototype = {
 		});
 	},
 
-	getPowerState: function(callback) {
-		if(!this.device){
-			callback(null, false);
-			return;
-		}
-
-		callback(null, this.device.power);
+	getTargetHeatingCoolingState: function(callback) {
+	    callback(null, this.TargetHeatingCoolingState);
 	},
 
-	setPowerState: function(state, callback) {
-		if(!this.device){
-			callback(new Error('No ac partner is discovered.'));
-			return;
-		}
-		
-		if (state) {
-			if (this.mode == 0) {
-				this.log.debug('Ac Partner Power on');
-				this.device.call('send_cmd', [this.powerOnOffModes["on"]]);
-				this.mode = 100;
-			}
-		} else {
-			this.log.debug('Ac Partner Power off');
-			this.device.call('send_cmd', [this.powerOnOffModes["off"]]);
-			this.mode = 0;
-		}
+	setTargetHeatingCoolingState: function(TargetHeatingCoolingState, callback, context) {
+	    if(context !== 'fromSetValue') {
+	      this.TargetHeatingCoolingState = TargetHeatingCoolingState;
+	      if (this.TargetHeatingCoolingState == Characteristic.TargetHeatingCoolingState.OFF) {
+	        this.log.debug('Ac Partner Power off');
+	      } else {
+			this.log.debug('Set TargetHeatingCoolingState: ' + this.TargetHeatingCoolingState);
+	      }
 
-		callback();
+	      this.SendCmd();
+	    }
+	    callback();
 	},
 
-	getTemperature: function(callback) {
-		if(!this.device){
-			callback(null, 0);
-			return;
-		}
-
-		callback(null, this.mode);
-		return;
+	getCurrentHeatingCoolingState: function(callback) {
+    	callback(null, this.TargetHeatingCoolingState);
 	},
 
-	setTemperature: function(temp, callback) {
-		if(!this.device){
-			callback(new Error('No ac partner is discovered.'));
-			return;
-		}
+	getTargetTemperature: function(callback) {
+	    callback(null, this.TargetTemperature);
+	},
 
-		if (temp != 100 && temp != 0) {
-			for(var item of this.tempModes){
-				if(temp <= item[0]){
-					this.log.debug('Set temperature: ' + item[1]['temp'] + ' mode: ' + temp);
-					var code = item[1]['code'];
-					this.device.call('send_cmd', [code]);
-					this.mode = item[0];
-					break;
-				}
-			}
-		}
+	setTargetTemperature: function(TargetTemperature, callback, context) {
+	    if(context !== 'fromSetValue') {
+	      	this.TargetTemperature = TargetTemperature;
+	      	if (this.TargetHeatingCoolingState == Characteristic.TargetHeatingCoolingState.OFF) {
+	      		this.TargetHeatingCoolingState = Characteristic.TargetHeatingCoolingState.AUTO;
+	      	}
 
-		callback();
+			this.log.debug('Set temperature: ' + TargetTemperature);
+			this.SendCmd();
+	    }
+
+	    callback();
 	},
 
 	identify: function(callback) {
@@ -173,5 +172,19 @@ MiAcPartner.prototype = {
 
 	getServices: function() {
 		return this.services;
+	},
+
+	SendCmd: function() {
+		var code = this.codePrefix
+				 + ((this.TargetHeatingCoolingState != Characteristic.TargetHeatingCoolingState.OFF) ? "1" : "0")	// Power
+				 + ((this.TargetHeatingCoolingState != Characteristic.TargetHeatingCoolingState.OFF) ? this.stateMaps[this.TargetHeatingCoolingState] : "2")
+				 + "3"	// Speed
+				 + "0"
+				 + this.tempMaps[this.TargetTemperature]
+				 + "02";	// Light
+
+		this.log.debug("code: " + code);
+
+		this.device.call('send_cmd', [code]);
 	}
 };
