@@ -97,7 +97,7 @@ MiAcPartner.prototype = {
 					return;
 			}	
 
-			if(reg.model != 'lumi.acpartner.v1') {
+			if(reg.model != 'lumi.acpartner.v1' && reg.model != 'lumi.acpartner.v2') {
 				return;
 			}
 
