@@ -1,4 +1,5 @@
 # homebridge-mi-ac-partner
+[![npm version](https://badge.fury.io/js/homebridge-mi-ac-partner.svg)](https://badge.fury.io/js/homebridge-mi-ac-partner)
 
 This is Xiaomi Mi Ac Partner plugin for [Homebridge](https://github.com/nfarina/homebridge). Since Apple Homekit is not supporting ac partner device yet, this plugin will add the ac partner as **Thermostat** to your Home app.
 
