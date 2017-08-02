@@ -34,7 +34,7 @@ Follow the [Document](https://github.com/aholstenson/miio/blob/master/docs/manag
    ```
      "accessories": [
        {
-	  "accessory": "MiAcPartner",
+          "accessory": "MiAcPartner",
           "token": "token-as-hex",
           "name": "Ac Partner"
        }

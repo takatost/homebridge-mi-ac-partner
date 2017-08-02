@@ -1,16 +1,15 @@
 {
-	"bridge": {
-		"name": "Homebridge",
-		"username": "CC:22:3D:E3:CE:30",
-		"port": 51826,
-		"pin": "123-45-568"
-	},
-
-	"accessories": [
-		{
-			"accessory": "MiAcPartner",
-			"token": "token-as-hex",
-  			"name": "Ac Partner"
-		}
-	]
+    "bridge": {
+        "name": "Homebridge",
+        "username": "CC:22:3D:E3:CE:30",
+        "port": 51826,
+        "pin": "123-45-568"
+    },
+    "accessories": [
+        {
+            "accessory": "MiAcPartner",
+            "token": "token-as-hex",
+            "name": "Ac Partner"
+        }
+    ]
 }
