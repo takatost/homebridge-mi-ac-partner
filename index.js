@@ -63,6 +63,15 @@ function MiAcPartner(log, config) {
         .on('set', this.setTargetTemperature.bind(this))
         .on('get', this.getTargetTemperature.bind(this));
 
+    this.acPartnerService
+        .getCharacteristic(Characteristic.CurrentTemperature)
+        .setProps({
+            maxValue: 30,
+            minValue: 16,
+            minStep: 1
+        })
+        .on('get', this.getCurrentTemperature.bind(this));;
+
     this.services.push(this.acPartnerService);
 
     this.serviceInfo = new Service.AccessoryInformation();
@@ -163,11 +172,21 @@ MiAcPartner.prototype = {
                   this.TargetHeatingCoolingState = Characteristic.TargetHeatingCoolingState.AUTO;
               }
 
+            // Update current temperature
+            this.acPartnerService
+                .getCharacteristic(Characteristic.CurrentTemperature)
+                .updateValue(parseFloat(TargetTemperature));
+
             this.log.debug('Set temperature: ' + TargetTemperature);
             this.SendCmd();
         }
 
         callback();
+    },
+
+    getCurrentTemperature: function(callback) {
+        this.log("CurrentTemperature %s", this.TargetTemperature);
+        callback(null, parseFloat(this.TargetTemperature));
     },
 
     identify: function(callback) {
