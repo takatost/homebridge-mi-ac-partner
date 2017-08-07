@@ -9,7 +9,9 @@
         {
             "accessory": "MiAcPartner",
             "token": "token-as-hex",
-            "name": "Ac Partner"
+            "name": "Ac Partner",
+            "brand": "media",
+            "preset_no": "1"
         }
     ]
 }

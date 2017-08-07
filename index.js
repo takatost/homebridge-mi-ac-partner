@@ -17,7 +17,14 @@ function MiAcPartner(log, config) {
 
     this.TargetHeatingCoolingState = Characteristic.TargetHeatingCoolingState.OFF;
     this.TargetTemperature = 23;
-    this.codePrefix = "0180111111";
+
+    var presets = require('./presets.json');
+
+    if (!presets[config.brand] || !presets[config.brand][config.preset_no]) {
+        log.error('Brand or preset_no invalid');
+    } else {
+        this.codeTpl = presets[config.brand][config.preset_no];
+    }
 
     this.services = [];
 
@@ -41,8 +48,7 @@ function MiAcPartner(log, config) {
         20: "14",
         19: "13",
         18: "12",
-        17: "11",
-        16: "10"
+        17: "11"
     };
 
     // Ac Partner is not available in Homekit yet, register as Fan
@@ -57,7 +63,7 @@ function MiAcPartner(log, config) {
         .getCharacteristic(Characteristic.TargetTemperature)
         .setProps({
             maxValue: 30,
-            minValue: 16,
+            minValue: 17,
             minStep: 1
         })
         .on('set', this.setTargetTemperature.bind(this))
@@ -67,7 +73,7 @@ function MiAcPartner(log, config) {
         .getCharacteristic(Characteristic.CurrentTemperature)
         .setProps({
             maxValue: 30,
-            minValue: 16,
+            minValue: 17,
             minStep: 1
         })
         .on('get', this.getCurrentTemperature.bind(this));;
@@ -203,13 +209,15 @@ MiAcPartner.prototype = {
             return;
         }
 
-        var code = this.codePrefix
-                 + ((this.TargetHeatingCoolingState != Characteristic.TargetHeatingCoolingState.OFF) ? "1" : "0")    // Power
-                 + ((this.TargetHeatingCoolingState != Characteristic.TargetHeatingCoolingState.OFF) ? this.stateMaps[this.TargetHeatingCoolingState] : "2")
-                 + "3"    // Speed
-                 + "0"
-                 + this.tempMaps[this.TargetTemperature]
-                 + "02";    // Light
+        if (!this.codeTpl) {
+            this.log.error('Command code invalid, brand or preset_no not set?')
+            return;
+        }
+
+        var code = this.codeTpl
+                .replace("p", ((this.TargetHeatingCoolingState != Characteristic.TargetHeatingCoolingState.OFF) ? "1" : "0"))    // Power
+                .replace("m", ((this.TargetHeatingCoolingState != Characteristic.TargetHeatingCoolingState.OFF) ? this.stateMaps[this.TargetHeatingCoolingState] : "2"))
+                .replace("tt", this.tempMaps[this.TargetTemperature]);
 
         this.log.debug("code: " + code);
 

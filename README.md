@@ -9,7 +9,7 @@ This is Xiaomi Mi Ac Partner plugin for [Homebridge](https://github.com/nfarina/
 
 * Control modes:
 
-  - Lift ac partner temperature between 16 - 30. 
+  - Lift ac partner temperature between 17 - 30. 
 
     **Notes:** Alternatively, you can ask Siri to change the temperature within the range to adjust the ac partner mode. Example:
 
@@ -36,11 +36,28 @@ Follow the [Document](https://github.com/aholstenson/miio/blob/master/docs/manag
        {
           "accessory": "MiAcPartner",
           "token": "token-as-hex",
-          "name": "Ac Partner"
+          "name": "Ac Partner",
+          "brand": "your AC brand",
+          "preset_no": "preset number of your AC in Mi App"
        }
      ]
    ```
 
+- Supports: brand `media` preset_no `1`, brand `gree` preset_no `1`
+
+Example: 
+
+     ```
+     "accessories": [
+       {
+          "accessory": "MiAcPartner",
+          "token": "eda2570a242a2e9f862b7d4ff1c93631",
+          "name": "Ac Partner",
+          "brand": "media",
+          "preset_no": "1"
+       }
+     ]
+   ```
    ​
 
 3. Restart Homebridge, and your Mi ac partner will be discovered automatically.
