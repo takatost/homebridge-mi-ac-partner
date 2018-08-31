@@ -1,3 +1,7 @@
+# PLEASE NOTE, THIS PROJECT IS NO LONGER BEING MAINTAINED
+
+-----
+
 # homebridge-mi-ac-partner
 [![npm version](https://badge.fury.io/js/homebridge-mi-ac-partner.svg)](https://badge.fury.io/js/homebridge-mi-ac-partner)
 
